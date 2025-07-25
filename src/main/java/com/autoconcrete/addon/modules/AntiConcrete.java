@@ -8,17 +8,21 @@ import meteordevelopment.meteorclient.utils.entity.SortPriority;
 import meteordevelopment.meteorclient.utils.entity.TargetUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.player.Rotations;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 
 public class AntiConcrete extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -64,12 +68,34 @@ public class AntiConcrete extends Module {
         .build()
     );
 
+    private final Setting<Boolean> antiAntiConcrete = sgGeneral.add(new BoolSetting.Builder()
+        .name("anti-anticoncrete")
+        .description("Breaks buttons/torches under enemies.")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<BreakMode> breakMode = sgGeneral.add(new EnumSetting.Builder<BreakMode>()
+        .name("break-mode")
+        .description("How to break enemy blocks.")
+        .defaultValue(BreakMode.Tap)
+        .visible(antiAntiConcrete::get)
+        .build()
+    );
+
+    private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
+        .name("rotate")
+        .description("Rotate toward blocks when placing or targeting.")
+        .defaultValue(true)
+        .build()
+    );
+
     private int returnTimer = -1;
     private int originalSlot = -1;
     private boolean waitingToReturn = false;
 
     public AntiConcrete() {
-        super(Xenon.XENON_CATEGORY, "anti-concrete", "Places a button under yourself.");
+        super(Xenon.XENON_CATEGORY, "anti-concrete", "Places a button under yourself and breaks enemy buttons.");
     }
 
     @EventHandler
@@ -79,6 +105,27 @@ public class AntiConcrete extends Module {
                 int hotbarSlot = hotbarSlotSetting.get() - 1;
                 InvUtils.move().from(hotbarSlot).to(originalSlot);
                 waitingToReturn = false;
+            }
+        }
+
+        if (antiAntiConcrete.get()) {
+            for (Entity entity : mc.world.getPlayers()) {
+                if (!(entity instanceof PlayerEntity player)) continue;
+                if (player == mc.player || player.isSpectator() || player.isCreative()) continue;
+
+                BlockPos under = player.getBlockPos();
+                Block targetBlock = mc.world.getBlockState(under).getBlock();
+                if (isButtonBlock(targetBlock) || isTorchBlock(targetBlock)) {
+                    if (rotate.get()) Rotations.rotate(Rotations.getYaw(under.toCenterPos()), Rotations.getPitch(under.toCenterPos()));
+                    if (breakMode.get() == BreakMode.Hold) {
+                        mc.options.attackKey.setPressed(true);
+                    } else {
+                        mc.options.attackKey.setPressed(false);
+                        mc.interactionManager.attackBlock(under, Direction.UP);
+                        mc.player.swingHand(Hand.MAIN_HAND);
+                    }
+                    break;
+                }
             }
         }
 
@@ -93,7 +140,7 @@ public class AntiConcrete extends Module {
 
     private void tryPlaceButton() {
         BlockPos currentPos = mc.player.getBlockPos();
-        if (isButtonBlock(currentPos)) return;
+        if (isButtonBlock(mc.world.getBlockState(currentPos).getBlock())) return;
 
         FindItemResult button = InvUtils.findInHotbar(stack -> isButton(stack.getItem()));
 
@@ -118,7 +165,8 @@ public class AntiConcrete extends Module {
             return;
         }
 
-        BlockUtils.place(currentPos, button, true, 0, false, false);
+        if (rotate.get()) Rotations.rotate(Rotations.getYaw(currentPos.toCenterPos()), Rotations.getPitch(currentPos.toCenterPos()));
+        BlockUtils.place(currentPos, button, rotate.get(), 0);
 
         if (swapped && originalSlot != -1) {
             returnTimer = returnDelay.get();
@@ -140,8 +188,7 @@ public class AntiConcrete extends Module {
 
         for (Entity entity : mc.world.getOtherEntities(null, box)) {
             if (entity instanceof FallingBlockEntity falling) {
-                Block block = falling.getBlockState().getBlock();
-                if (isConcretePowderBlock(block)) detected = true;
+                if (isConcretePowderBlock(falling.getBlockState().getBlock())) detected = true;
             }
         }
 
@@ -153,64 +200,30 @@ public class AntiConcrete extends Module {
     }
 
     private boolean isConcretePowderBlock(Block block) {
-        return block == Blocks.WHITE_CONCRETE_POWDER ||
-            block == Blocks.LIGHT_GRAY_CONCRETE_POWDER ||
-            block == Blocks.GRAY_CONCRETE_POWDER ||
-            block == Blocks.BLACK_CONCRETE_POWDER ||
-            block == Blocks.BROWN_CONCRETE_POWDER ||
-            block == Blocks.RED_CONCRETE_POWDER ||
-            block == Blocks.ORANGE_CONCRETE_POWDER ||
-            block == Blocks.YELLOW_CONCRETE_POWDER ||
-            block == Blocks.LIME_CONCRETE_POWDER ||
-            block == Blocks.GREEN_CONCRETE_POWDER ||
-            block == Blocks.CYAN_CONCRETE_POWDER ||
-            block == Blocks.LIGHT_BLUE_CONCRETE_POWDER ||
-            block == Blocks.BLUE_CONCRETE_POWDER ||
-            block == Blocks.PURPLE_CONCRETE_POWDER ||
-            block == Blocks.MAGENTA_CONCRETE_POWDER ||
-            block == Blocks.PINK_CONCRETE_POWDER ||
-            block == Blocks.GRAVEL ||
-            block == Blocks.SAND ||
-            block == Blocks.RED_SAND ||
-            block == Blocks.SUSPICIOUS_SAND ||
-            block == Blocks.SUSPICIOUS_GRAVEL;
+        return block.toString().contains("concrete_powder") ||
+            block == Blocks.GRAVEL || block == Blocks.SAND || block == Blocks.RED_SAND ||
+            block == Blocks.SUSPICIOUS_SAND || block == Blocks.SUSPICIOUS_GRAVEL;
     }
 
-    private boolean isButtonBlock(BlockPos pos) {
-        Block block = mc.world.getBlockState(pos).getBlock();
-        return block == Blocks.POLISHED_BLACKSTONE_BUTTON ||
-            block == Blocks.STONE_BUTTON ||
-            block == Blocks.WARPED_BUTTON ||
-            block == Blocks.CRIMSON_BUTTON ||
-            block == Blocks.BAMBOO_BUTTON ||
-            block == Blocks.CHERRY_BUTTON ||
-            block == Blocks.MANGROVE_BUTTON ||
-            block == Blocks.DARK_OAK_BUTTON ||
-            block == Blocks.ACACIA_BUTTON ||
-            block == Blocks.JUNGLE_BUTTON ||
-            block == Blocks.BIRCH_BUTTON ||
-            block == Blocks.SPRUCE_BUTTON ||
-            block == Blocks.OAK_BUTTON;
+    private boolean isButtonBlock(Block block) {
+        return block.toString().toLowerCase().contains("button");
+    }
+
+    private boolean isTorchBlock(Block block) {
+        return block.toString().toLowerCase().contains("torch");
     }
 
     private boolean isButton(Item item) {
-        return item == Items.POLISHED_BLACKSTONE_BUTTON ||
-            item == Items.STONE_BUTTON ||
-            item == Items.WARPED_BUTTON ||
-            item == Items.CRIMSON_BUTTON ||
-            item == Items.BAMBOO_BUTTON ||
-            item == Items.CHERRY_BUTTON ||
-            item == Items.MANGROVE_BUTTON ||
-            item == Items.DARK_OAK_BUTTON ||
-            item == Items.ACACIA_BUTTON ||
-            item == Items.JUNGLE_BUTTON ||
-            item == Items.BIRCH_BUTTON ||
-            item == Items.SPRUCE_BUTTON ||
-            item == Items.OAK_BUTTON;
+        return item.toString().toLowerCase().contains("button");
     }
 
     public enum Mode {
         Strict,
         Smart
+    }
+
+    public enum BreakMode {
+        Tap,
+        Hold
     }
 }
