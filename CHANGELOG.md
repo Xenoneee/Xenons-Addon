@@ -2,7 +2,15 @@
 
 ---
 
-##  Changes in v0.1.5
+
+## v0.1.6 - July 26th 2025
+### Fixed
+- Reduced delay for chat feedback in `AntiConcrete`.
+- Fixed chat delay when activating or running `AutoTNTplus`.
+
+
+---
+
 
 ## v0.1.5 - July 25th 2025
 ### Added
@@ -36,11 +44,8 @@
 - Renamed `AntiAntiConcrete` to `AntiConcreteDetection` for clarity and PVP-themed naming.
 
 
-
-
 ---
 
-##  Changes in v0.1.4
 
 ## v0.1.4 - July 24th 2025
 
@@ -61,9 +66,9 @@
 - Enhanced **silent inventory swap** logic to return items after delay automatically.
 - Detection logic for button/torch identification.
 
+
 ---
 
-##  Changes in v0.1.3
 
 ## v0.1.3 - July 23rd 2025
 
