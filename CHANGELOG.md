@@ -2,15 +2,31 @@
 
 ---
 
+## v0.1.7 - August 4th 2025
+
+### Changed
+- Updated addon base from **Minecraft 1.21.1** to **1.21.5** for compatibility with latest MioClient version.
+
+### Added
+
+### AutoCityPlus
+- Automatically mines blocks adjacent to a nearby player's surround.
+    - Detects and targets the nearest valid player within range.
+    - Scans all four sides around the player’s feet to find a breakable block.
+    - Can optionally target **bedrock** blocks using the `Mine Bedrock` toggle.
+    - Places **support blocks** (e.g., obsidian) underneath if there’s no block below.
+    - Uses **natural vanilla mining** (no packet mining).
+    - Includes optional `Rotate` toggle to face the break target.
+    - Renders a box on the block being mined using color and shape settings.
+
+---
 
 ## v0.1.6 - July 26th 2025
 ### Fixed
 - Reduced delay for chat feedback in `AntiConcrete`.
 - Fixed chat delay when activating or running `AutoTNTplus`.
 
-
 ---
-
 
 ## v0.1.5 - July 25th 2025
 ### Added
@@ -43,9 +59,7 @@
 - Added safe loop over concrete position array with null checks.
 - Renamed `AntiAntiConcrete` to `AntiConcreteDetection` for clarity and PVP-themed naming.
 
-
 ---
-
 
 ## v0.1.4 - July 24th 2025
 
@@ -66,9 +80,7 @@
 - Enhanced **silent inventory swap** logic to return items after delay automatically.
 - Detection logic for button/torch identification.
 
-
 ---
-
 
 ## v0.1.3 - July 23rd 2025
 

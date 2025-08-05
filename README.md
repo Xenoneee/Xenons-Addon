@@ -1,11 +1,10 @@
 # Xenon's Addon
 
-A Meteor Client addon for Minecraft 1.21.1 that includes powerful PvP automation tools like **AutoConcrete**, **AntiConcrete**, and **AutoTNTplus** 
+A Meteor Client addon for Minecraft 1.21.5 that includes powerful PvP automation tools like **AutoConcrete**, **AntiConcrete**, **AntiConcreteDetection**, **AutoTNTplus**, and **AutoCityPlus** 
 
 ---
 
 ##  Features
-
 ###  AutoConcrete
 Automatically builds a vertical obsidian pillar beside a nearby target and drops concrete powder on their head.
 
@@ -87,6 +86,35 @@ Automatically places and ignites TNT on top of a pillar beside a target.
 - `Use Fire Charge`: Toggle for fire charge ignition.
 - `Air Place`: Enables TNT placement in air.
 - `Place Support`: Builds obsidian pillar when air place is off.
+
+---
+
+### AutoCityPlus
+Automatically mines blocks adjacent to a nearby player's position.
+
+- Scans for the **nearest valid target** within range.
+- Checks all **four horizontal blocks** around the target's feet for mineable blocks.
+- Can be configured to **target Bedrock** blocks when enabled.
+- Supports placing a **support block (Obsidian)** underneath the break target if needed.
+- Simulates **natural mining** using vanilla mining logic (no packet mining).
+- Optional **rotation** to face the target block during mining.
+- In-game block **highlight rendering** for the selected break block.
+- Sends **debug messages** in chat about target acquisition and mining status.
+
+**Settings:**
+- `Target Range`: Distance to search for players to target.
+- `Break Range`: Maximum distance to mine blocks.
+- `Mine Bedrock`: Allows bedrock blocks to be mined.
+- `Support`: Place support block beneath the mining target if needed.
+- `Place Range`: Distance limit for placing support blocks.
+- `Rotate`: Rotate to face the mining block.
+- `Chat Info`: Send status messages in chat (e.g. target found).
+- `Chat Delay`: How often to send chat messages.
+- `Swing Hand`: Toggle whether to swing your hand while mining.
+- `Render Block`: Toggle rendering the mining target.
+- `Shape Mode`: Choose between side, line, or both rendering shapes.
+- `Side Color`: Color for box sides.
+- `Line Color`: Color for box lines.
 
 ##  License
 This project is licensed under the CC0-1.0 license.
