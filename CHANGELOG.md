@@ -2,6 +2,41 @@
 
 ---
 
+## v0.1.8 - August 6th 2025
+
+### Added
+
+### 🌀 AutoPearlTeleport (Input)
+Teleports you to your enderpearl when your totem threshold is reached by silently messaging your alt to activate your enderpearl stasis chamber.
+
+- Sends a `/msg` to your alt when your **totem count reaches a threshold**.
+- Tracks totems in **inventory, hotbar, and offhand**.
+- Optional **force teleport toggle** to trigger teleport instantly.
+- Includes automatic cooldowns and resets after join/reconnection to a server.
+
+**Settings:**
+- `Alt Name`: Your alt account's username to send msg to (blank by default).
+- `Totem Threshold`: Number of totems to trigger escape (sync with Output module).
+- `Force Teleport`: Send a manual `/msg` to force teleport.
+
+---
+
+### 🌀 AutoPearlTeleport (Output)
+Receives a message from your main account and right-clicks the nearest trapdoor to teleport when the totem threshold is reached.
+
+- Listens for `/msg` from the main account to trigger teleportation.
+- Parses totem count and activates if at or below threshold.
+- Finds and interacts with the **closest trapdoor** automatically to activate enderpearl stasis chamber.
+- Supports **all trapdoor types**.
+- Ignores spoofed messages not sent by your real account.
+
+**Settings:**
+- `Main Name`: Your main account's username to receive msg from(blank by default).
+- `Totem Threshold`: Match this with the Input module for accurate syncing.
+
+
+---
+
 ## v0.1.7 - August 4th 2025
 
 ### Changed
