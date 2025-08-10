@@ -2,6 +2,27 @@
 
 ---
 
+## v0.1.9 - August 10th 2025
+
+### Added
+
+### AutoPearlThrow
+- Added automatic Ender Pearl throw on totem pop with wall avoidance, jump assist, and smart pitch selection.
+- New 360° auto-aim with option to avoid throwing toward enemies.
+- Reserve totem protection – skips throws when at or below a set totem count.
+- Silent swap support with inventory pulling if no pearls in hotbar.
+- Fallback straight-up throw when fully trapped.
+- Customizable cooldown, throw delay, and pitch settings.
+- Manual test keybind for instant pearl throws without totem pop.
+- Debug mode for logging throw decisions.
+
+### Fixed
+
+### AutoPearlTeleport (Input)
+- **Fixed:** `Force Teleport` toggle now sends the **threshold value** from the slider instead of the **current totem count**, ensuring the **Output** module always triggers immediately.
+- **Improved:** Added a safety check to avoid sending messages if the Alt Account field is blank.
+
+---
 ## v0.1.8 - August 6th 2025
 
 ### Added

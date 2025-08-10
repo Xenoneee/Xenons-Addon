@@ -1,6 +1,6 @@
 # Xenon's Addon
 
-A Meteor Client addon for Minecraft 1.21.5 that includes powerful PvP automation tools like **AutoConcrete**, **AntiConcrete**, **AntiConcreteDetection**, **AutoTNTplus**, **AutoCityPlus**, and **AutoPearlTeleport**. 
+A Meteor Client addon for Minecraft 1.21.5 that includes powerful PvP automation tools like **AutoConcrete**, **AntiConcrete**, **AntiConcreteDetection**, **AutoTNTplus**, **AutoCityPlus**, **AutoPearlTeleport**, and **AutoPearlThrow** 
 
 ---
 
@@ -145,6 +145,64 @@ Receives a message from your main account and right-clicks the nearest trapdoor 
 **Settings:**
 - `Main Name`: Your main account's username to receive msg from(blank by default).
 - `Totem Threshold`: Match this with the Input module for accurate syncing.
+
+---
+
+## AutoPearlThrow
+Automatically throws an Ender Pearl away from danger when your totem pops, with advanced aiming, obstacle avoidance, totem reserve logic, and inventory handling. Designed for high risk PvP situations to quickly escape.
+
+### **Features**
+- **`Automatic Trigger on Totem Pop:`** – Instantly schedules a pearl throw when your totem breaks.
+- **`360° Auto-Aim:`** – Searches for the best throw direction in all directions, optionally avoiding throwing toward enemies.
+- **`Smart Pitch Selection:`** – Automatically selects the lowest possible pitch for max range without hitting obstacles.
+- **`Wall & Obstacle Avoidance:`** – Skips throws into nearby walls, raises pitch if blocked, and can fallback to throwing straight up if trapped.
+- **`Jump Before Throw:`** – Optional jump to see over 2-block walls before throwing.
+- **`Reserve Totem Protection:`** – Skips pearl throws when your total totems (in hotbar, inventory, offhand, and cursor) are at or below a set threshold.
+- **`Silent Swap:`** – Temporarily swaps to pearls, throws, then swaps back without disrupting your hotbar setup.
+- **`Inventory Pulling:`** – Can move pearls from your inventory into a hotbar slot automatically if none are available.
+- **`Manual Test Key:`** – Option to bind a key to manually test throws without needing a totem pop.
+- **`Cooldowns & Delays:`** – Configurable cooldown between throws and delay after totem pop.
+- **`Detailed Debug Logging:`** – Optional debug mode for step-by-step throw decisions.
+
+---
+
+### **Settings**
+#### **General**
+- **`Rotate:`** – Rotates your view toward the aim direction before throwing.
+- **`Pitch Up (deg):`** – Default upward aim when auto-pitch is disabled.
+- **`Throw Delay (ms):`** – Delay after totem pop before throwing.
+- **`Cooldown (ms):`** – Minimum time between throws.
+- **`Silent Swap:`** – Enables silent hotbar swapping to pearls.
+- **`Prefer Offhand:`** – Uses offhand pearls first if available.
+- **`Jump on Throw:`** – Jumps before throwing to clear 2-block walls.
+- **`Jump Wait (ms):`** – Delay after jumping before aiming/throwing.
+- **`Reserve Totems:`** – Enable/disable skipping throws when low on totems.
+- **`Reserve Count:`** – Minimum totem count before skipping throws.
+
+#### **Aiming**
+- **Auto Pitch:** – Automatically picks the flattest possible pitch for the chosen distance range.
+- **`Allow 360 Aim:`** – Search all directions for the best yaw instead of only behind you.
+- **`Avoid Enemy Cone:`** – Avoid throwing toward the nearest enemy within a cone.
+- **`Enemy Cone Degrees:`** – Width of the avoidance cone in degrees.
+- **`Min Escape Distance:`** – Minimum distance the pearl should land.
+- **`Max Escape Distance:`** – Maximum allowed landing distance.
+
+#### **Safety**
+- **`Clear Check Distance:`** – Distance to check along aim direction for blocking walls.
+- **`Try Side Offsets:`** – When blocked, try yaw offsets (±20°).
+- **`Escalate Pitch:`** – If blocked, increase pitch to clear obstacles.
+- **`Fallback Straight Up:`** – If all else fails, throw straight up.
+- **`Near Path Check:`** – Checks first N blocks of pearl’s path for collisions.
+- **`Initial Clearance:`** – Minimum clearance distance from eyes to avoid immediate wall collisions.
+
+#### **Inventory**
+- **`Pull from Inventory:`** – Pull pearls from main inventory if none in hotbar.
+- **`Prefer Empty Hotbar:`** – Use empty hotbar slots when pulling from inventory.
+- **`Temp Hotbar Slot:`** – Default hotbar slot for pulled pearls.
+
+#### **Debug**
+- **`Debug Logging:`** – Logs throw decisions and debug info.
+- **`Manual Test Key:`** – Binds a key to manually trigger a throw.
 
 ---
 
