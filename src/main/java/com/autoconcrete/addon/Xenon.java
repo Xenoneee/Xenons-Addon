@@ -16,6 +16,10 @@ public class Xenon extends MeteorAddon {
         Modules.get().add(new com.autoconcrete.addon.modules.AntiConcrete());
         Modules.get().add(new com.autoconcrete.addon.modules.AutoTNTplus());
         Modules.get().add(new com.autoconcrete.addon.modules.AntiConcreteDetection());
+        Modules.get().add(new com.autoconcrete.addon.modules.AutoCityPlus());
+        Modules.get().add(new com.autoconcrete.addon.modules.AutoPearlTeleportInput());
+        Modules.get().add(new com.autoconcrete.addon.modules.AutoPearlTeleportOutput());
+        Modules.get().add(new com.autoconcrete.addon.modules.AutoPearlThrow());
     }
 
     @Override
