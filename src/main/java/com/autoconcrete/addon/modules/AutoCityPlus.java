@@ -4,18 +4,20 @@ import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.Rotations;
-import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -48,6 +50,29 @@ public class AutoCityPlus extends Module {
         .name("mine-bedrock")
         .description("Allows mining bedrock blocks.")
         .defaultValue(false)
+        .build()
+    );
+
+    // NEW: Prioritize bedrock the player is standing in (visible only when mining bedrock)
+    private final Setting<Boolean> prioritizePlayerBedrock = sgGeneral.add(new BoolSetting.Builder()
+        .name("prioritize-player-bedrock")
+        .description("Prioritize mining the bedrock the target is standing in over surrounding blocks.")
+        .defaultValue(true)
+        .visible(mineBedrock::get)
+        .build()
+    );
+
+    private final Setting<Boolean> ignoreFriends = sgGeneral.add(new BoolSetting.Builder()
+        .name("ignore-friends")
+        .description("Don't target players on your friends list.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> ignoreNaked = sgGeneral.add(new BoolSetting.Builder()
+        .name("ignore-naked")
+        .description("Don't target players with no armor equipped.")
+        .defaultValue(true)
         .build()
     );
 
@@ -128,6 +153,7 @@ public class AutoCityPlus extends Module {
 
     private PlayerEntity target;
     private BlockPos targetPos;
+    private int chatCooldown = 0;
 
     public AutoCityPlus() {
         super(Xenon.XENON_CATEGORY, "auto-city-plus", "Automatically mine blocks next to someone's feet.");
@@ -137,15 +163,32 @@ public class AutoCityPlus extends Module {
     public void onActivate() {
         target = null;
         targetPos = null;
+        chatCooldown = 0;
+    }
+
+    // NEW: Safety check to avoid rotation/mining when you’re floating with a block above head
+    private boolean shouldAllowRotation() {
+        BlockPos playerPos = mc.player.getBlockPos();
+        Block blockAtFeet = mc.world.getBlockState(playerPos).getBlock();
+        Block blockAboveHead = mc.world.getBlockState(playerPos.up(1)).getBlock();
+
+        // If standing in air AND there’s a block above head, skip rotate/mine (prevents scuffed rotation)
+        if (blockAtFeet == Blocks.AIR && blockAboveHead != Blocks.AIR) return false;
+        return true;
     }
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
+        if (chatCooldown > 0) chatCooldown--;
+
         target = null;
         double closestDistance = targetRange.get() * targetRange.get();
 
         for (PlayerEntity player : mc.world.getPlayers()) {
             if (player == mc.player || player.isCreative() || player.isSpectator()) continue;
+            if (ignoreFriends.get() && Friends.get().isFriend(player)) continue;
+            if (ignoreNaked.get() && isNaked(player)) continue;
+
             double distance = player.squaredDistanceTo(mc.player);
             if (distance <= closestDistance) {
                 closestDistance = distance;
@@ -155,8 +198,30 @@ public class AutoCityPlus extends Module {
 
         if (target == null) return;
 
-        targetPos = findCityBlock(target);
-        if (targetPos == null) return;
+        // Prefer bedrock in the target's lower hitbox if enabled and in range
+        boolean handledStandingBedrock = false;
+        if (mineBedrock.get() && prioritizePlayerBedrock.get()) {
+            BlockPos lowerHitboxPos = target.getBlockPos();
+            Block lowerHitboxBlock = mc.world.getBlockState(lowerHitboxPos).getBlock();
+
+            if (lowerHitboxBlock == Blocks.BEDROCK
+                && PlayerUtils.squaredDistanceTo(lowerHitboxPos) <= breakRange.get() * breakRange.get()) {
+
+                targetPos = lowerHitboxPos;
+                handledStandingBedrock = true;
+
+                if (chatInfo.get() && chatCooldown <= 0) {
+                    info("Breaking bedrock in lower hitbox.");
+                    chatCooldown = chatDelay.get();
+                }
+            }
+        }
+
+        // Otherwise pick a city block around the target
+        if (!handledStandingBedrock) {
+            targetPos = findCityBlock(target);
+            if (targetPos == null) return;
+        }
 
         if (PlayerUtils.squaredDistanceTo(targetPos) > breakRange.get() * breakRange.get()) return;
 
@@ -164,15 +229,15 @@ public class AutoCityPlus extends Module {
             BlockUtils.place(targetPos.down(), InvUtils.findInHotbar(Items.OBSIDIAN), rotate.get(), 0, true);
         }
 
-        if (rotate.get()) {
+        boolean allowActions = shouldAllowRotation();
+
+        if (rotate.get() && allowActions) {
             Rotations.rotate(Rotations.getYaw(targetPos), Rotations.getPitch(targetPos));
         }
 
-        // ✅ Actual block mining (simulate "holding left click")
-        mc.interactionManager.updateBlockBreakingProgress(targetPos, Direction.UP);
-
-        if (swingHand.get()) {
-            mc.player.swingHand(Hand.MAIN_HAND);
+        if (allowActions) {
+            mc.interactionManager.updateBlockBreakingProgress(targetPos, Direction.UP);
+            if (swingHand.get()) mc.player.swingHand(Hand.MAIN_HAND);
         }
     }
 
@@ -188,6 +253,13 @@ public class AutoCityPlus extends Module {
             else if (!mineBedrock.get() && block != Blocks.AIR && block != Blocks.BEDROCK) return offset;
         }
         return null;
+    }
+
+    private boolean isNaked(PlayerEntity player) {
+        return player.getEquippedStack(EquipmentSlot.HEAD).isEmpty()
+            && player.getEquippedStack(EquipmentSlot.CHEST).isEmpty()
+            && player.getEquippedStack(EquipmentSlot.LEGS).isEmpty()
+            && player.getEquippedStack(EquipmentSlot.FEET).isEmpty();
     }
 
     @EventHandler
