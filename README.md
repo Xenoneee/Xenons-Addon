@@ -152,17 +152,17 @@ Receives a message from your main account and right-clicks the nearest trapdoor 
 Automatically throws an Ender Pearl away from danger when your totem pops, with advanced aiming, obstacle avoidance, totem reserve logic, and inventory handling. Designed for high risk PvP situations to quickly escape.
 
 ### **Features**
-- **`Automatic Trigger on Totem Pop:`** – Instantly schedules a pearl throw when your totem breaks.
-- **`360° Auto-Aim:`** – Searches for the best throw direction in all directions, optionally avoiding throwing toward enemies.
-- **`Smart Pitch Selection:`** – Automatically selects the lowest possible pitch for max range without hitting obstacles.
-- **`Wall & Obstacle Avoidance:`** – Skips throws into nearby walls, raises pitch if blocked, and can fallback to throwing straight up if trapped.
-- **`Jump Before Throw:`** – Optional jump to see over 2-block walls before throwing.
-- **`Reserve Totem Protection:`** – Skips pearl throws when your total totems (in hotbar, inventory, offhand, and cursor) are at or below a set threshold.
-- **`Silent Swap:`** – Temporarily swaps to pearls, throws, then swaps back without disrupting your hotbar setup.
-- **`Inventory Pulling:`** – Can move pearls from your inventory into a hotbar slot automatically if none are available.
-- **`Manual Test Key:`** – Option to bind a key to manually test throws without needing a totem pop.
-- **`Cooldowns & Delays:`** – Configurable cooldown between throws and delay after totem pop.
-- **`Detailed Debug Logging:`** – Optional debug mode for step-by-step throw decisions.
+- **Automatic Trigger on Totem Pop:** – Instantly schedules a pearl throw when your totem breaks.
+- **360° Auto-Aim:** – Searches for the best throw direction in all directions, optionally avoiding throwing toward enemies.
+- **Smart Pitch Selection:** – Automatically selects the lowest possible pitch for max range without hitting obstacles.
+- **Wall & Obstacle Avoidance:** – Skips throws into nearby walls, raises pitch if blocked, and can fallback to throwing straight up if trapped.
+- **Jump Before Throw:** – Optional jump to see over 2-block walls before throwing.
+- **Reserve Totem Protection:** – Skips pearl throws when your total totems (in hotbar, inventory, offhand, and cursor) are at or below a set threshold.
+- **Silent Swap:** – Temporarily swaps to pearls, throws, then swaps back without disrupting your hotbar setup.
+- **Inventory Pulling:** – Can move pearls from your inventory into a hotbar slot automatically if none are available.
+- **Manual Test Key:** – Option to bind a key to manually test throws without needing a totem pop.
+- **Cooldowns & Delays:** – Configurable cooldown between throws and delay after totem pop.
+- **Detailed Debug Logging:** – Optional debug mode for step-by-step throw decisions.
 
 ---
 
@@ -180,7 +180,7 @@ Automatically throws an Ender Pearl away from danger when your totem pops, with 
 - **`Reserve Count:`** – Minimum totem count before skipping throws.
 
 #### **Aiming**
-- **Auto Pitch:** – Automatically picks the flattest possible pitch for the chosen distance range.
+- **`Auto Pitch:`** – Automatically picks the flattest possible pitch for the chosen distance range.
 - **`Allow 360 Aim:`** – Search all directions for the best yaw instead of only behind you.
 - **`Avoid Enemy Cone:`** – Avoid throwing toward the nearest enemy within a cone.
 - **`Enemy Cone Degrees:`** – Width of the avoidance cone in degrees.
