@@ -2,6 +2,53 @@
 
 ---
 
+---
+
+## v0.2.0 - August 13th 2025
+
+### Updated
+
+### AutominePlus
+- **Renamed & upgraded AutoCityPlus** with new bedrock-clearing features.
+- Automatically mines blocks adjacent to a nearby player’s surround, with:
+    - Optional **Bedrock mining** toggle.
+    - **Clear Upper Bedrock** option: Automatically break bedrock in **your own upper hitbox** when phased into it to free AutoMine/AutoCrystal.
+    - Prioritize **bedrock under target's feet** if enabled.
+- Supports **support block placement** under break target if missing.
+- Fully configurable render, rotation, and chat feedback.
+- Safety checks to avoid scuffed rotations unless clearing upper bedrock.
+- All original AutoCityPlus settings included with added options:
+    - `Prioritize Target Standing Bedrock`
+    - `Clear Upper Bedrock`
+
+### Added
+
+### AutoWebFeetPlace
+Automatically places a cobweb, ladder, or button in a broken surround slot under or beside the target to prevent them from replacing their surround.
+
+- Detects when a target is already in a surround.
+- Monitors surround blocks for **break events** and places the chosen item immediately when a hole appears.
+- Works with **cobwebs, ladders, or any button type**.
+- Adjustable spam rate for repeated placement attempts.
+- Includes **Silent Swap** and **Inventory Pull** so items can be used from inventory without hotbar disruption.
+- Can prioritize the hole closest to you or pick the first available.
+- Optional rotation to face the placement block.
+
+**Settings:**
+- `Place Item`: Choose between `Cobweb`, `Ladder`, or `Button` (all types supported).
+- `Range`: Target detection distance.
+- `Ignore Friends`: Skip players on your friends list.
+- `Ignore Naked`: Skip players without armor.
+- `Attempts Per Second`: Placement spam rate.
+- `Rotate`: Rotate player toward placement.
+- `Silent Swap`: Place from hotbar silently without switching slots.
+- `Only When Air`: Only attempt placement if the hole is air/replaceable.
+- `Prefer Closest Hole`: Prioritize nearest broken surround hole.
+- `Grab From Inventory`: Move items from main inventory to a hotbar slot when not found in hotbar.
+- `Hotbar Slot`: Slot number for grabbed items.
+
+---
+
 ## v0.1.9 - August 10th 2025
 
 ### Added

@@ -1,6 +1,6 @@
 # Xenon's Addon
 
-A Meteor Client addon for Minecraft 1.21.5 that includes powerful PvP automation tools like **AutoConcrete**, **AntiConcrete**, **AntiConcreteDetection**, **AutoTNTplus**, **AutoCityPlus**, **AutoPearlTeleport**, and **AutoPearlThrow** 
+A Meteor Client addon for Minecraft 1.21.5 that includes powerful PvP automation tools like **AutoConcrete**, **AntiConcrete**, **AntiConcreteDetection**, **AutoTNTplus**, **AutoMinePlus**, **AutoPearlTeleport**, **AutoPearlThrow**, and AutoWebFeetPlace.
 
 ---
 
@@ -89,8 +89,8 @@ Automatically places and ignites TNT on top of a pillar beside a target.
 
 ---
 
-### AutoCityPlus
-Automatically mines blocks adjacent to a nearby player's position.
+### AutoMinePlus
+An enhanced automine module with bedrock clearing and improved targeting.
 
 - Scans for the **nearest valid target** within range.
 - Checks all **four horizontal blocks** around the target's feet for mineable blocks.
@@ -98,13 +98,16 @@ Automatically mines blocks adjacent to a nearby player's position.
 - Supports placing a **support block (Obsidian)** underneath the break target if needed.
 - Simulates **natural mining** using vanilla mining logic (no packet mining).
 - Optional **rotation** to face the target block during mining.
-- In-game block **highlight rendering** for the selected break block.
 - Sends **debug messages** in chat about target acquisition and mining status.
 
 **Settings:**
 - `Target Range`: Distance to search for players to target.
 - `Break Range`: Maximum distance to mine blocks.
 - `Mine Bedrock`: Allows bedrock blocks to be mined.
+- `Prioritize Target Standing Bedrock`: Prefer mining Bedrock under the target's feet.
+- `Clear Upper Bedrock`: Automatically break Bedrock in your own upper hitbox.
+- `Ignore Friends`: Skip friends from targeting.
+- `Ignore Naked`: Skip players without armor.
 - `Support`: Place support block beneath the mining target if needed.
 - `Place Range`: Distance limit for placing support blocks.
 - `Rotate`: Rotate to face the mining block.
@@ -203,6 +206,32 @@ Automatically throws an Ender Pearl away from danger when your totem pops, with 
 #### **Debug**
 - **`Debug Logging:`** – Logs throw decisions and debug info.
 - **`Manual Test Key:`** – Binds a key to manually trigger a throw.
+
+---
+
+### AutoWebFeetPlace
+Automatically places a cobweb, ladder, or button in a broken surround slot under or beside the target to prevent them from replacing their surround.
+
+- Detects when a target is already in a surround.
+- Monitors surround blocks for **break events** and places the chosen item immediately when a hole appears.
+- Works with **cobwebs, ladders, or any button type**.
+- Adjustable spam rate for repeated placement attempts.
+- Includes **Silent Swap** and **Inventory Pull** so items can be used from inventory without hotbar disruption.
+- Can prioritize the hole closest to you or pick the first available.
+- Optional rotation to face the placement block.
+
+**Settings:**
+- `Place Item`: Choose between `Cobweb`, `Ladder`, or `Button` (all types supported).
+- `Range`: Target detection distance.
+- `Ignore Friends`: Skip players on your friends list.
+- `Ignore Naked`: Skip players without armor.
+- `Attempts Per Second`: Placement spam rate.
+- `Rotate`: Rotate player toward placement.
+- `Silent Swap`: Place from hotbar silently without switching slots.
+- `Only When Air`: Only attempt placement if the hole is air/replaceable.
+- `Prefer Closest Hole`: Prioritize nearest broken surround hole.
+- `Grab From Inventory`: Move items from main inventory to a hotbar slot when not found in hotbar.
+- `Hotbar Slot`: Slot number for grabbed items.
 
 ---
 
