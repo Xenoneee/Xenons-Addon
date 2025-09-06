@@ -19,6 +19,9 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
+// 1.21.x food detection
+import net.minecraft.component.DataComponentTypes;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -79,6 +82,14 @@ public class AutoWebFeetPlace extends Module {
     private final Setting<Boolean> preferClosestSide = sgPlace.add(new BoolSetting.Builder()
         .name("prefer-closest-hole").description("If multiple sides broke, prefer the one closest to you.")
         .defaultValue(true).build()
+    );
+
+    // NEW: pause while eating (same style as AutoMinePlus)
+    private final Setting<Boolean> pauseWhileEating = sgPlace.add(new BoolSetting.Builder()
+        .name("pause-while-eating")
+        .description("Temporarily pauses while you’re eating food.")
+        .defaultValue(true)
+        .build()
     );
 
     // Inventory (runtime grab)
@@ -151,6 +162,11 @@ public class AutoWebFeetPlace extends Module {
     private void onTick(TickEvent.Post event) {
         if (mc.player == null || mc.world == null) return;
 
+        // Pause while eating (DataComponentTypes.FOOD like AutoMinePlus)
+        if (pauseWhileEating.get() && mc.player.isUsingItem() && isFood(mc.player.getActiveItem())) {
+            return;
+        }
+
         final PlayerEntity target = findNearestTarget();
         if (target == null) { clearLock(); return; }
 
@@ -189,6 +205,11 @@ public class AutoWebFeetPlace extends Module {
 
         // Place
         placeAt(broken, fir);
+    }
+
+    // ---------- Food util (copied style from AutoMinePlus) ----------
+    private boolean isFood(ItemStack stack) {
+        return stack != null && !stack.isEmpty() && stack.get(DataComponentTypes.FOOD) != null;
     }
 
     // ---------- Surround helpers ----------
