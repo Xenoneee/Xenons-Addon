@@ -17,9 +17,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+
+// Food detection (1.21.x)
+import net.minecraft.component.DataComponentTypes;
 
 import com.autoconcrete.addon.Xenon;
 
@@ -111,6 +115,14 @@ public class AutoMinePlus extends Module {
         .build()
     );
 
+    // NEW: Pause while eating
+    private final Setting<Boolean> pauseWhileEating = sgGeneral.add(new BoolSetting.Builder()
+        .name("pause-while-eating")
+        .description("Temporarily pauses AutoMinePlus while you're eating food.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<Boolean> chatInfo = sgGeneral.add(new BoolSetting.Builder()
         .name("chat-info")
         .description("Sends debug info in chat.")
@@ -167,6 +179,9 @@ public class AutoMinePlus extends Module {
     private BlockPos targetPos;
     private int chatCooldown = 0;
 
+    // Track eating state for clean one-time messages
+    private boolean wasEating = false;
+
     public AutoMinePlus() {
         super(Xenon.XENON_CATEGORY, "AutoMinePlus", "Expanded Automine with bedrock utilities.");
     }
@@ -176,6 +191,7 @@ public class AutoMinePlus extends Module {
         target = null;
         targetPos = null;
         chatCooldown = 0;
+        wasEating = false;
     }
 
     // Safety: avoid weird rotates when floating with a block above head.
@@ -193,6 +209,28 @@ public class AutoMinePlus extends Module {
     @EventHandler
     private void onTick(TickEvent.Post event) {
         if (chatCooldown > 0) chatCooldown--;
+
+        // --- Pause-while-eating early-out ---
+        if (pauseWhileEating.get() && mc.player != null) {
+            boolean eatingNow = mc.player.isUsingItem() && isFood(mc.player.getActiveItem());
+            if (eatingNow) {
+                if (!wasEating) {
+                    if (chatInfo.get() && chatCooldown <= 0) {
+                        info("Paused: eating.");
+                        chatCooldown = chatDelay.get();
+                    }
+                    wasEating = true;
+                }
+                return; // do nothing while eating
+            } else if (wasEating) {
+                if (chatInfo.get() && chatCooldown <= 0) {
+                    info("Resuming after eating.");
+                    chatCooldown = chatDelay.get();
+                }
+                wasEating = false;
+            }
+        }
+        // ------------------------------------
 
         // 1) NEW: Clear your own upper hitbox bedrock first (independent of targeting others)
         if (clearUpperBedrock.get()) {
@@ -315,6 +353,11 @@ public class AutoMinePlus extends Module {
             && player.getEquippedStack(EquipmentSlot.CHEST).isEmpty()
             && player.getEquippedStack(EquipmentSlot.LEGS).isEmpty()
             && player.getEquippedStack(EquipmentSlot.FEET).isEmpty();
+    }
+
+    // Detect if an ItemStack is food (1.21.x data components)
+    private boolean isFood(ItemStack stack) {
+        return stack != null && !stack.isEmpty() && stack.get(DataComponentTypes.FOOD) != null;
     }
 
     @EventHandler
